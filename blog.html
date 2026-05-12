@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - ssfdre38</title>
+    <meta name="description" content="Research, insights, and innovations in AI compression and accessibility.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --bg-dark: #0a0a0f;
+            --bg-dark-800: #111118;
+            --bg-dark-700: #1a1a24;
+            --bg-dark-600: #232330;
+            --text: #e2e8f0;
+            --text-light: #94a3b8;
+            --text-muted: #64748b;
+            --border: #2d2d3a;
+            --border-light: #3a3a4a;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg-dark);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            padding: 16px 0;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(10, 10, 15, 0.95);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        nav .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            object-fit: cover;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        nav .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        nav .nav-links a:hover,
+        nav .nav-links a.active {
+            color: var(--primary-light);
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--bg-dark-800) 0%, var(--bg-dark-700) 100%);
+            padding: 140px 0 80px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        header p {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Main Content */
+        main {
+            padding: 80px 0;
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 32px;
+        }
+
+        .post-card {
+            background: var(--bg-dark-700);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .post-meta {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .post-tag {
+            background: var(--bg-dark-600);
+            color: var(--primary-light);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+        }
+
+        .post-date {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .post-card h2 {
+            font-size: 1.75rem;
+            margin-bottom: 12px;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .post-card h2 a {
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .post-card h2 a:hover {
+            color: var(--primary-light);
+        }
+
+        .post-excerpt {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .read-more {
+            display: inline-block;
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .read-more:hover {
+            color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-dark-800);
+            color: white;
+            padding: 40px 0;
+            margin-top: 80px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            .posts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav id="nav">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="ssfdre38-head.png" alt="ssfdre38">
+                <span>ssfdre38</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="blog.html" class="active">Blog</a>
+                <a href="research.html">Research</a>
+                <a href="https://github.com/ssfdre38">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <header>
+        <div class="container">
+            <h1>Blog & Research</h1>
+            <p>Insights, breakthroughs, and deep dives into AI compression, quantization, and accessibility</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="posts-grid">
+                <!-- Featured: Gemma4-nano Research -->
+                <div class="post-card">
+                    <div class="post-meta">
+                        <span class="post-tag">🔬 Research</span>
+                        <span class="post-tag">Featured</span>
+                        <span class="post-date">May 2026</span>
+                    </div>
+                    <h2><a href="research.html">Beyond TurboQuant: The gemma4-nano Journey</a></h2>
+                    <p class="post-excerpt">
+                        How we achieved sub-1GB AI that outperforms Google's compression research. 
+                        A deep dive into Q3_K_S quantization, mobile validation, and why smaller 
+                        models run faster than their larger counterparts.
+                    </p>
+                    <a href="research.html" class="read-more">Read Research →</a>
+                </div>
+
+                <!-- Mobile Validation -->
+                <div class="post-card">
+                    <div class="post-meta">
+                        <span class="post-tag">📱 Mobile</span>
+                        <span class="post-tag">Validation</span>
+                        <span class="post-date">May 2026</span>
+                    </div>
+                    <h2><a href="#">Real-World Mobile Testing: Why Stock Models Fail</a></h2>
+                    <p class="post-excerpt">
+                        We tested Google's "mobile-ready" Gemma 4 on a high-end phone. 
+                        It overheated. Our nano version stayed cool. Here's the technical 
+                        breakdown of why size matters on mobile devices.
+                    </p>
+                    <a href="#" class="read-more">Coming Soon →</a>
+                </div>
+
+                <!-- Cloud Speed Locally -->
+                <div class="post-card">
+                    <div class="post-meta">
+                        <span class="post-tag">⚡ Performance</span>
+                        <span class="post-date">May 2026</span>
+                    </div>
+                    <h2><a href="#">Cloud Speed, Zero Latency: The Local AI Advantage</a></h2>
+                    <p class="post-excerpt">
+                        Why 20+ tokens/sec on a CPU feels faster than cloud AI. The physics 
+                        of network latency vs local inference, and why offline-first architecture 
+                        will win in the long run.
+                    </p>
+                    <a href="#" class="read-more">Coming Soon →</a>
+                </div>
+
+                <!-- Kaggle Hackathon -->
+                <div class="post-card">
+                    <div class="post-meta">
+                        <span class="post-tag">🏆 Competition</span>
+                        <span class="post-date">May 2026</span>
+                    </div>
+                    <h2><a href="#">Kaggle Gemma 4 Good: Building gemma4-turbo</a></h2>
+                    <p class="post-excerpt">
+                        Our submission to the Kaggle Gemma 4 Good Hackathon. How we built 
+                        IQ4_XS quantized models with vision support, and what we learned 
+                        about BF16 quantization pipelines.
+                    </p>
+                    <a href="#" class="read-more">Coming Soon →</a>
+                </div>
+
+                <!-- Pocket Ash Vision -->
+                <div class="post-card">
+                    <div class="post-meta">
+                        <span class="post-tag">📱 Product</span>
+                        <span class="post-date">May 2026</span>
+                    </div>
+                    <h2><a href="#">Pocket Ash: Your AI Companion, Truly Offline</a></h2>
+                    <p class="post-excerpt">
+                        The vision for mobile AI that doesn't require internet, doesn't cost money, 
+                        and doesn't compromise on capability. Building the future of personal AI assistants.
+                    </p>
+                    <a href="#" class="read-more">Coming Soon →</a>
+                </div>
+
+                <!-- Google's Marketing Gap -->
+                <div class="post-card">
+                    <div class="post-meta">
+                        <span class="post-tag">💡 Analysis</span>
+                        <span class="post-date">May 2026</span>
+                    </div>
+                    <h2><a href="#">Google's "Mobile-Ready" Gap: Promise vs Reality</a></h2>
+                    <p class="post-excerpt">
+                        What does "mobile-ready" actually mean? Google says Gemma 4 is optimized 
+                        for mobile, but real-world testing tells a different story. Where the industry 
+                        went wrong and how indie developers are fixing it.
+                    </p>
+                    <a href="#" class="read-more">Coming Soon →</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 ssfdre38 • <a href="https://github.com/ssfdre38">GitHub</a> • <a href="https://ollama.com/ssfdre38">Ollama</a> • <a href="https://huggingface.co/ssfdre38">Hugging Face</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
