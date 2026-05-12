@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-World Mobile Testing: Why Stock Models Fail - ssfdre38</title>
+    <meta name="description" content="Testing Google's 'mobile-ready' Gemma 4 on actual phones reveals a harsh truth: the smallest model overheats. Here's why.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --bg-dark: #0a0a0f;
+            --bg-dark-800: #111118;
+            --bg-dark-700: #1a1a24;
+            --bg-dark-600: #232330;
+            --text: #e2e8f0;
+            --text-light: #94a3b8;
+            --text-muted: #64748b;
+            --border: #2d2d3a;
+            --border-light: #3a3a4a;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.8;
+            color: var(--text);
+            background: var(--bg-dark);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            padding: 16px 0;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(10, 10, 15, 0.95);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1280px;
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        nav .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            object-fit: cover;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        nav .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        nav .nav-links a:hover,
+        nav .nav-links a.active {
+            color: var(--primary-light);
+        }
+
+        article {
+            padding: 140px 0 80px;
+        }
+
+        .article-header {
+            margin-bottom: 64px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .article-tag {
+            background: var(--bg-dark-700);
+            color: var(--primary-light);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+        }
+
+        .article-date {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .article-subtitle {
+            font-size: 1.4rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .article-content {
+            font-size: 1.1rem;
+            line-height: 1.9;
+        }
+
+        .article-content h2 {
+            font-size: 2rem;
+            margin: 64px 0 24px;
+            color: var(--text);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .article-content h2:first-child {
+            margin-top: 0;
+        }
+
+        .article-content h3 {
+            font-size: 1.5rem;
+            margin: 48px 0 20px;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .article-content p {
+            margin-bottom: 24px;
+            color: var(--text-light);
+        }
+
+        .article-content strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .article-content ul, .article-content ol {
+            margin: 24px 0;
+            padding-left: 28px;
+        }
+
+        .article-content li {
+            margin-bottom: 12px;
+            color: var(--text-light);
+        }
+
+        .article-content code {
+            background: var(--bg-dark-700);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--primary-light);
+            border: 1px solid var(--border);
+        }
+
+        .highlight-box {
+            background: var(--bg-dark-700);
+            border-left: 4px solid var(--primary);
+            padding: 24px 28px;
+            margin: 32px 0;
+            border-radius: 8px;
+        }
+
+        .highlight-box strong {
+            color: var(--primary-light);
+            display: block;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 24px 28px;
+            margin: 32px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .comparison-table {
+            width: 100%;
+            margin: 32px 0;
+            border-collapse: collapse;
+            background: var(--bg-dark-700);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table th {
+            background: var(--bg-dark-600);
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            color: var(--text-light);
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        footer {
+            background: var(--bg-dark-800);
+            color: white;
+            padding: 40px 0;
+            margin-top: 80px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .article-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .article-content {
+                font-size: 1rem;
+            }
+
+            nav .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav id="nav">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="ssfdre38-head.png" alt="ssfdre38">
+                <span>ssfdre38</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="blog.html" class="active">Blog</a>
+                <a href="research.html">Research</a>
+                <a href="https://github.com/ssfdre38">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <article>
+        <div class="container">
+            <div class="article-header">
+                <div class="article-meta">
+                    <span class="article-tag">📱 Mobile</span>
+                    <span class="article-tag">Validation</span>
+                    <span class="article-date">May 2026</span>
+                </div>
+                <h1>Real-World Mobile Testing: Why Stock Models Fail</h1>
+                <p class="article-subtitle">
+                    We tested Google's "mobile-ready" Gemma 4 on a high-end phone with 8GB RAM. It overheated and crawled to a halt. 
+                    Then we tested our nano version. It stayed cool. Here's the technical breakdown.
+                </p>
+            </div>
+
+            <div class="article-content">
+                <h2>The Test</h2>
+                <p>
+                    Google markets Gemma 4 as "optimized for mobile deployment." That's a strong claim. 
+                    So we tested it on actual hardware:
+                </p>
+
+                <ul>
+                    <li><strong>Device:</strong> High-end phone, 8GB RAM, 256GB storage</li>
+                    <li><strong>App:</strong> Offline AI (Hugging Face integration)</li>
+                    <li><strong>Model:</strong> Stock gemma4:e2b (7.2 GB) — the smallest official model</li>
+                    <li><strong>Task:</strong> General conversation, typical Q&A</li>
+                </ul>
+
+                <p>
+                    If Google's smallest model works on a high-end phone, it proves mobile readiness. 
+                    If it fails here, it will fail everywhere.
+                </p>
+
+                <div class="warning-box">
+                    <strong>Result: Complete Failure</strong>
+                    <p>The phone became uncomfortably hot within minutes. Performance degraded rapidly. 
+                    After 5-10 minutes, responses slowed to unusability. This is not a "mobile-ready" experience.</p>
+                </div>
+
+                <h2>Why It Failed</h2>
+
+                <h3>1. Memory Pressure</h3>
+                <p>
+                    Android typically uses ~2GB for the OS. That leaves 6GB for apps. Loading a 7.2 GB model:
+                </p>
+
+                <ul>
+                    <li><strong>Immediate memory swap:</strong> Model doesn't fit in available RAM</li>
+                    <li><strong>Constant disk I/O:</strong> System swaps memory pages to storage</li>
+                    <li><strong>Performance degradation:</strong> SSD/flash memory is 100x slower than RAM</li>
+                    <li><strong>CPU thrashing:</strong> Processor wastes cycles managing memory</li>
+                </ul>
+
+                <h3>2. Memory Bandwidth</h3>
+                <p>
+                    Even if the model fits, inference requires reading weights constantly:
+                </p>
+
+                <ul>
+                    <li><strong>7.2 GB at 20 tokens/sec</strong> = massive bandwidth demand</li>
+                    <li><strong>Mobile RAM bandwidth:</strong> Much lower than desktop DDR5</li>
+                    <li><strong>Heat generation:</strong> Memory access generates significant thermal output</li>
+                    <li><strong>Battery drain:</strong> High bandwidth = high power consumption</li>
+                </ul>
+
+                <h3>3. Thermal Throttling</h3>
+                <p>
+                    Phones are thermally constrained by design:
+                </p>
+
+                <ul>
+                    <li><strong>No active cooling:</strong> Unlike laptops/desktops, phones rely on passive cooling</li>
+                    <li><strong>Small thermal mass:</strong> Heats up quickly, cools down slowly</li>
+                    <li><strong>Throttling kicks in early:</strong> Typically at 45-50°C to prevent damage</li>
+                    <li><strong>Performance collapse:</strong> CPU/GPU clocks reduced by 50%+ when throttled</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>The Death Spiral</strong>
+                    <p>Large model → High memory bandwidth → Heat generation → Thermal throttling → 
+                    Slower inference → Longer sessions → More heat → Deeper throttling → Unusable performance</p>
+                </div>
+
+                <h2>Testing gemma4-nano</h2>
+
+                <p>
+                    Next test: Our optimized gemma4-nano:e2b (3.1 GB) on the same phone:
+                </p>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Stock gemma4:e2b</th>
+                            <th>gemma4-nano:e2b</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Model Size</td>
+                            <td>7.2 GB</td>
+                            <td>3.1 GB</td>
+                        </tr>
+                        <tr>
+                            <td>RAM Fit</td>
+                            <td>❌ Requires swap</td>
+                            <td>✅ Fits comfortably</td>
+                        </tr>
+                        <tr>
+                            <td>Temperature</td>
+                            <td>🔥 Hot</td>
+                            <td>✅ Warm but stable</td>
+                        </tr>
+                        <tr>
+                            <td>Performance</td>
+                            <td>❌ Slow, degrading</td>
+                            <td>✅ Fast, consistent</td>
+                        </tr>
+                        <tr>
+                            <td>CPU Clocks</td>
+                            <td>⚠️ Throttled</td>
+                            <td>✅ Pinned (working hard)</td>
+                        </tr>
+                        <tr>
+                            <td>Usability</td>
+                            <td>❌ No</td>
+                            <td>✅ Yes</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Why Nano Succeeds</h3>
+
+                <p>
+                    The nano model works because it respects mobile constraints:
+                </p>
+
+                <ul>
+                    <li><strong>Fits in RAM:</strong> 3.1 GB + OS + apps = under 6GB total</li>
+                    <li><strong>Lower bandwidth:</strong> 57% smaller = 57% less memory traffic</li>
+                    <li><strong>Stays cool:</strong> Reduced memory access = less heat</li>
+                    <li><strong>Sustained performance:</strong> No thermal throttling = consistent speed</li>
+                </ul>
+
+                <p>
+                    The CPU still runs hard (clocks pinned), but critically: <strong>it doesn't overheat</strong>. 
+                    The thermal envelope is manageable. This is the difference between "technically possible" 
+                    and "actually usable."
+                </p>
+
+                <h2>The Math</h2>
+
+                <p>
+                    Let's break down why size matters so much on mobile:
+                </p>
+
+                <h3>Available RAM Budget</h3>
+                <ul>
+                    <li><strong>Total RAM:</strong> 8GB</li>
+                    <li><strong>Android OS:</strong> ~2GB</li>
+                    <li><strong>System services:</strong> ~500MB</li>
+                    <li><strong>Available for apps:</strong> ~5.5GB</li>
+                </ul>
+
+                <h3>Stock Model (7.2 GB)</h3>
+                <ul>
+                    <li><strong>Needs:</strong> 7.2 GB</li>
+                    <li><strong>Available:</strong> 5.5 GB</li>
+                    <li><strong>Deficit:</strong> 1.7 GB → Constant swapping</li>
+                </ul>
+
+                <h3>Nano Model (3.1 GB)</h3>
+                <ul>
+                    <li><strong>Needs:</strong> 3.1 GB</li>
+                    <li><strong>Available:</strong> 5.5 GB</li>
+                    <li><strong>Headroom:</strong> 2.4 GB → Room to breathe</li>
+                </ul>
+
+                <p>
+                    That 2.4 GB of headroom is the difference between thermal throttling and sustained performance.
+                </p>
+
+                <h2>Industry Implications</h2>
+
+                <h3>For Google</h3>
+                <p>
+                    Gemma 4 is technically impressive, but the "mobile-ready" claim is misleading:
+                </p>
+
+                <ul>
+                    <li><strong>"Mobile-ready" should mean:</strong> Fast, cool, usable on typical phones</li>
+                    <li><strong>Google's definition:</strong> Can technically load on 8GB+ device</li>
+                    <li><strong>The gap:</strong> Lab benchmarks miss thermal constraints</li>
+                </ul>
+
+                <h3>For Users</h3>
+                <p>
+                    If you have a phone with 8GB RAM and try to run stock Gemma 4:
+                </p>
+
+                <ul>
+                    <li>Expect overheating</li>
+                    <li>Expect performance degradation</li>
+                    <li>Expect battery drain</li>
+                    <li>Consider nano instead</li>
+                </ul>
+
+                <h3>For Developers</h3>
+                <p>
+                    Building mobile AI apps? Key takeaways:
+                </p>
+
+                <ul>
+                    <li><strong>4GB should be your target</strong> for models on 8GB phones</li>
+                    <li><strong>3GB is better</strong> for budget phones (4-6GB RAM)</li>
+                    <li><strong>Test on real devices</strong> for extended sessions (30+ minutes)</li>
+                    <li><strong>Monitor thermals</strong> not just performance metrics</li>
+                </ul>
+
+                <h2>What "Mobile-Ready" Actually Means</h2>
+
+                <p>
+                    There's a massive gap between these definitions:
+                </p>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Marketing Definition</th>
+                            <th>Reality Definition</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Size</td>
+                            <td>"Fits on device"</td>
+                            <td>"Fits in RAM with headroom"</td>
+                        </tr>
+                        <tr>
+                            <td>Performance</td>
+                            <td>"Can run"</td>
+                            <td>"Runs fast without throttling"</td>
+                        </tr>
+                        <tr>
+                            <td>Thermals</td>
+                            <td>(ignored)</td>
+                            <td>"Stays cool for hours"</td>
+                        </tr>
+                        <tr>
+                            <td>Battery</td>
+                            <td>(ignored)</td>
+                            <td>"Reasonable power draw"</td>
+                        </tr>
+                        <tr>
+                            <td>User Experience</td>
+                            <td>"Technically works"</td>
+                            <td>"Pleasant to use daily"</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight-box">
+                    <strong>The Bottom Line</strong>
+                    <p>A model isn't "mobile-ready" if it overheats your phone. Period. 
+                    Real mobile readiness means sustained performance at comfortable temperatures.</p>
+                </div>
+
+                <h2>Try It Yourself</h2>
+
+                <p>
+                    You can validate these findings on your own phone:
+                </p>
+
+                <ul>
+                    <li><strong>Install Offline AI</strong> (supports Hugging Face models)</li>
+                    <li><strong>Try stock gemma4:e2b</strong> from Google</li>
+                    <li><strong>Try gemma4-nano:e2b</strong> from <a href="https://huggingface.co/ssfdre38/gemma4-nano-gguf" style="color: var(--primary-light);">ssfdre38/gemma4-nano-gguf</a></li>
+                    <li><strong>Compare:</strong> Temperature, performance consistency, battery drain</li>
+                </ul>
+
+                <p>
+                    This isn't theoretical. This is reproducible science. The industry needs to 
+                    update its definition of "mobile-ready" to include thermal and power constraints.
+                </p>
+
+                <p style="margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border);">
+                    <strong>Related:</strong> <a href="research.html" style="color: var(--primary-light);">Beyond TurboQuant: The gemma4-nano Journey</a>
+                </p>
+            </div>
+        </div>
+    </article>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 ssfdre38 • <a href="https://github.com/ssfdre38">GitHub</a> • <a href="https://ollama.com/ssfdre38">Ollama</a> • <a href="https://huggingface.co/ssfdre38">Hugging Face</a></p>
+        </div>
+    </footer>
+
+    <script>
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
