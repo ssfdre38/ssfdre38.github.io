@@ -408,14 +408,24 @@
                 <h3>1. Quantization Strategy</h3>
                 <p>
                     We used <code>Q3_K_S</code> quantization from llama.cpp, which implements 3-bit quantization 
-                    with k-quants for structured compression. Unlike Google's IQ4_XS approach:
+                    with k-quants for structured compression. <strong>Key design decision: Remove vision and audio capabilities, 
+                    keep full 4.5B parameters and 128K context window.</strong>
                 </p>
 
                 <ul>
-                    <li><strong>Simpler dequantization path</strong> — fewer operations per token</li>
+                    <li><strong>Full parameter retention</strong> — 4.5B params preserved for text inference quality</li>
+                    <li><strong>128K context maintained</strong> — no reduction in context window size</li>
+                    <li><strong>Multimodal features removed</strong> — vision and audio dropped to reduce size</li>
+                    <li><strong>Simpler dequantization path</strong> — fewer operations per token vs IQ4_XS</li>
                     <li><strong>Better cache utilization</strong> — smaller model fits better in L2/L3 cache</li>
                     <li><strong>Lower memory bandwidth</strong> — 3 bits vs 4 bits = 25% less data movement</li>
                 </ul>
+
+                <p>
+                    This approach targets <strong>low-power systems</strong> where text-only AI is needed without 
+                    GPU acceleration. By removing multimodal features rather than reducing parameters, we maintain 
+                    text quality while achieving mobile-friendly sizes.
+                </p>
 
                 <h3>2. Model Variants</h3>
                 <p>We quantized the entire Gemma 4 family:</p>
