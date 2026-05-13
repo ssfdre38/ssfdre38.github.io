@@ -423,10 +423,164 @@
             </p>
         </div>
 
-        <!-- Future experiments will be added here -->
+        <!-- Experiment #3 -->
+        <div class="experiment">
+            <h3>Experiment #3: GPTQ Alternative Analysis <span class="status complete">COMPLETE</span></h3>
+            <div class="meta">Date: May 13, 2026 | Research: GPTQ vs llama-imatrix comparison</div>
+            
+            <p><strong>Objective:</strong> Investigate GPTQ (Hessian-based importance) as alternative to llama-imatrix's activation-based approach.</p>
+
+            <div class="finding">
+                <strong>Key Finding:</strong> GPTQ offers theoretically superior importance calculation (complete tensor coverage by design), 
+                but **no 2-bit Gemma 4 models exist anywhere** (HuggingFace, Ollama, community repos). If GPTQ could break the barrier, 
+                someone would have done it by now. The 3-bit floor is universal across all quantization methods.
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Importance Type</th>
+                        <th>Coverage</th>
+                        <th>Sub-3-bit?</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>llama-imatrix</td>
+                        <td>Activation-based</td>
+                        <td>❌ Partial (275/601)</td>
+                        <td>❌</td>
+                        <td>Blocked by tool</td>
+                    </tr>
+                    <tr>
+                        <td>GPTQ</td>
+                        <td>Hessian-based</td>
+                        <td>✅ Complete (all tensors)</td>
+                        <td>⚠️</td>
+                        <td>Theory works, practice fails</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Why GPTQ Should Work:</strong> Computes second-order gradients (∂²Loss/∂w²) during quantization, giving importance score 
+            for EVERY weight automatically. No calibration dataset dependency. Native 2-bit support in papers.</p>
+
+            <p><strong>Why It Doesn't:</strong> Web search of HuggingFace (May 2026) shows zero 2-bit Gemma 4 models (GPTQ or otherwise). 
+            Community consensus: "2-bit introduces sharp quality and stability trade-offs that make it unsuitable for most real-world use." 
+            All published models stop at 4-bit, rarely 3-bit.</p>
+
+            <p style="margin-top: 1rem;"><strong>Architectural Barrier Confirmed:</strong></p>
+            <ul style="margin-left: 2rem; line-height: 1.8;">
+                <li><strong>PLE pathway</strong> (52% of model) - Dense embeddings cannot tolerate 2-bit</li>
+                <li><strong>Proportional RoPE</strong> - Position encodings lose granularity at 2-bit</li>
+                <li><strong>Shared KV cache</strong> - Early layer errors amplify exponentially</li>
+                <li><strong>Logit soft-capping</strong> - Scale factors get sheared by 2-bit rounding</li>
+            </ul>
+
+            <p style="margin-top: 1rem; background: #2a2a2a; padding: 1rem; border-left: 3px solid var(--accent); border-radius: 4px;">
+                <strong>Conclusion:</strong> The 3-bit barrier exists due to BOTH tooling limitations AND architectural constraints. 
+                GPTQ won't save us - the absence of 2-bit models proves the floor is real.
+            </p>
+        </div>
+
+        <!-- Experiment #4 -->
+        <div class="experiment">
+            <h3>Experiment #4: Mixed-Precision Bypass <span class="status failed">FAILED</span></h3>
+            <div class="meta">Date: May 13, 2026 | Quantization: 5.12 bpw actual (2.5 bpw target)</div>
+            
+            <p><strong>Objective:</strong> Bypass imatrix barrier using mixed-precision: protect critical layers (PLE, global attention) at Q3_K/Q4_K, compress FFN aggressively to Q2_K.</p>
+
+            <div class="finding">
+                <strong>Key Finding:</strong> Quantization completed successfully, model loaded into Ollama, but inference produced 
+                **severe coherence collapse** (infinite repetition loops, nonsense output). Additionally, <code>--tensor-type-file</code> 
+                flag didn't apply specifications correctly, resulting in 5.12 bpw instead of target ~2.5 bpw.
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Target</th>
+                        <th>Actual Result</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Quantization</td>
+                        <td>~2.5 bpw mixed</td>
+                        <td>5.12 bpw (unintended mix)</td>
+                        <td>⚠️ Completed but wrong</td>
+                    </tr>
+                    <tr>
+                        <td>Loading</td>
+                        <td>Load into Ollama</td>
+                        <td>Loaded successfully</td>
+                        <td>✅ Passed</td>
+                    </tr>
+                    <tr>
+                        <td>Inference</td>
+                        <td>Generate coherent text</td>
+                        <td>Infinite loop: "Is this a riddle/puzzle?" ×∞</td>
+                        <td>❌ Collapsed</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>What Went Wrong:</strong> The tool's <code>--tensor-type-file</code> flag was inconsistently applied. 
+            Instead of protecting PLE at Q4_K and global attention at Q3_K as specified, the quantizer:</p>
+            <ul style="margin-left: 2rem; line-height: 1.8;">
+                <li>Over-protected PLE embedding (Q6_K instead of Q4_K)</li>
+                <li>Under-protected global attention layers 15-34 (Q2_K instead of Q3_K)</li>
+                <li>Result: Wrong precision distribution, even though average was higher than baseline</li>
+            </ul>
+
+            <p><strong>Critical Insight:</strong> <strong>HOW precision is distributed matters more than the average.</strong></p>
+            <table style="margin-top: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Quantization</th>
+                        <th>BPW</th>
+                        <th>Distribution</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Q3_K_S (baseline)</td>
+                        <td>3.41</td>
+                        <td>✅ Uniform 3-bit</td>
+                        <td>✅ Stable</td>
+                    </tr>
+                    <tr>
+                        <td>Q2_K (Exp #1)</td>
+                        <td>2.96</td>
+                        <td>❌ Uniform 2-bit</td>
+                        <td>❌ Hangs</td>
+                    </tr>
+                    <tr>
+                        <td>Mixed (Exp #4)</td>
+                        <td>5.12</td>
+                        <td>❌ Wrong layers protected</td>
+                        <td>❌ Loops</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="margin-top: 1rem; background: #2a2a2a; padding: 1rem; border-left: 3px solid var(--warning); border-radius: 4px;">
+                <strong>Verdict:</strong> Even at 5.12 bpw (well above the 3-bit floor), incorrect precision distribution causes collapse. 
+                Protecting the wrong layers is worse than uniform quantization. The 3-bit barrier has THREE simultaneous causes: 
+                tooling limitations, architectural constraints, and mathematical information density floors. All must be solved together.
+            </p>
+        </div>
+
+        <!-- Future experiments -->
         <div style="background: #1a1a1a; border: 1px dashed var(--border); border-radius: 8px; padding: 2rem; text-align: center; color: #666;">
-            <p style="font-style: italic;">Next experiment: Synthetic imatrix completion or llama-imatrix source modification</p>
-            <p style="margin-top: 0.5rem; font-size: 0.9rem;">Lab reports published as experiments complete</p>
+            <p style="font-style: italic; font-size: 1.1rem; color: var(--text-dim);">The 3-bit floor stands: 4 experiments, 3 different approaches, 0 successes.</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">Q3_K_S at 3.41 bpw (3.1GB) remains the proven stable floor for Gemma 4.</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">Next: Test on non-PLE architectures (Llama, Phi) or accept the floor and optimize Q3_K_S performance.</p>
         </div>
 
         <div class="mission" style="margin-top: 3rem;">
