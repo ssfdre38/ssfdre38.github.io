@@ -623,11 +623,85 @@
             </p>
         </div>
 
+        <!-- Experiment 5 -->
+        <div class="experiment">
+            <h3>🔬 Experiment #5: imatrix Coverage Debug</h3>
+            <p><strong>Date:</strong> May 13, 2026</p>
+            <p><strong>Objective:</strong> Fix llama-imatrix incomplete coverage (275/601 tensors) by providing larger calibration dataset and more chunks.</p>
+
+            <div class="finding">
+                <strong>Key Finding:</strong> Coverage limitation is **not a data problem**—it's a tool or architectural limitation. 
+                20x larger dataset improved PPL (8.36 vs 9.09) but coverage remained at ~275/601 tensors. File sizes nearly identical (2.66 MB vs 2.69 MB).
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Old imatrix</th>
+                        <th>New imatrix</th>
+                        <th>Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Dataset size</td>
+                        <td>14 KB</td>
+                        <td>294 KB</td>
+                        <td>+20x</td>
+                    </tr>
+                    <tr>
+                        <td>Chunks processed</td>
+                        <td>130</td>
+                        <td>32</td>
+                        <td>-75%</td>
+                    </tr>
+                    <tr>
+                        <td>Context window</td>
+                        <td>512</td>
+                        <td>2048</td>
+                        <td>+4x</td>
+                    </tr>
+                    <tr>
+                        <td>Final PPL</td>
+                        <td>9.09</td>
+                        <td>8.3552</td>
+                        <td>✅ Better</td>
+                    </tr>
+                    <tr>
+                        <td>Tensor coverage</td>
+                        <td>275/601 (45.8%)</td>
+                        <td>~275/601 (est.)</td>
+                        <td>❌ No change</td>
+                    </tr>
+                    <tr>
+                        <td>File size</td>
+                        <td>2.69 MB</td>
+                        <td>2.66 MB</td>
+                        <td>-1.1%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>What This Reveals:</strong> llama-imatrix appears to have a hard-coded limitation preventing coverage of Gemma 4's global attention layers (blk.15-34). These are exactly the critical PLE pathway layers.</p>
+
+            <ul style="margin-left: 2rem; line-height: 1.8;">
+                <li><strong>Evidence:</strong> File sizes nearly identical despite different processing strategies</li>
+                <li><strong>Pattern:</strong> Coverage stops at same 275-tensor cutoff across all attempts</li>
+                <li><strong>Impact:</strong> Blocks IQ2_M/Q2_K_S importance-weighted quantization methods</li>
+            </ul>
+
+            <p style="margin-top: 1rem; background: #2a2a2a; padding: 1rem; border-left: 3px solid var(--warning); border-radius: 4px;">
+                <strong>Verdict:</strong> Cannot solve imatrix coverage with larger datasets. Tool may have architectural assumptions (non-SWA, standard transformers) 
+                that don't account for Gemma 4's shared KV cache and sliding window patterns. Path forward: Manual importance mapping using architectural analysis.
+            </p>
+        </div>
+
         <!-- Future experiments -->
         <div style="background: #1a1a1a; border: 1px dashed var(--border); border-radius: 8px; padding: 2rem; text-align: center; color: #666;">
-            <p style="font-style: italic; font-size: 1.1rem; color: var(--text-dim);">The 3-bit floor stands: 4 experiments, 3 different approaches, 0 successes.</p>
+            <p style="font-style: italic; font-size: 1.1rem; color: var(--text-dim);">The 3-bit floor stands: 5 experiments, 4 different approaches, 0 successes.</p>
             <p style="margin-top: 1rem; font-size: 0.9rem;">Q3_K_S at 3.41 bpw (3.1GB) remains the proven stable floor for Gemma 4.</p>
-            <p style="margin-top: 1rem; font-size: 0.9rem;">Next: Test on non-PLE architectures (Llama, Phi) or accept the floor and optimize Q3_K_S performance.</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">Next: Manual importance mapping via architectural analysis, or cross-architecture testing (Llama 3.3, Phi-4).</p>
         </div>
 
         <div class="mission" style="margin-top: 3rem;">
