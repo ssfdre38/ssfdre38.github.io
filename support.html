@@ -257,6 +257,22 @@
         .back-link:hover {
             color: var(--primary);
         }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            header h1 { font-size: 1.8rem; }
+            header p { font-size: 1rem; }
+            h2 { font-size: 1.6rem !important; }
+            h3 { font-size: 1.2rem !important; }
+            .impact-grid { grid-template-columns: 1fr !important; }
+            .donation-buttons { flex-direction: column; align-items: stretch; }
+            .donation-buttons a { text-align: center; min-width: unset; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 0 12px; }
+            header h1 { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
