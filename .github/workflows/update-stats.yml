@@ -1,0 +1,68 @@
+name: Update Download Stats
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # Daily at 6am UTC
+  workflow_dispatch:        # Manual trigger
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch and compute stats
+        run: |
+          python3 - <<'EOF'
+          import urllib.request, json, re
+          from datetime import datetime, timezone
+
+          # HuggingFace API
+          with urllib.request.urlopen(
+              "https://huggingface.co/api/models?author=ssfdre38&limit=50"
+          ) as r:
+              hf_data = json.loads(r.read())
+
+          hf_turbo = next((m["downloads"] for m in hf_data if "turbo" in m["id"]), 0)
+          hf_nano  = next((m["downloads"] for m in hf_data if "nano"  in m["id"]), 0)
+
+          # Ollama profile scrape
+          req = urllib.request.Request(
+              "https://ollama.com/ssfdre38",
+              headers={"User-Agent": "Mozilla/5.0 (compatible; StatsBot/1.0)"}
+          )
+          with urllib.request.urlopen(req) as r:
+              html = r.read().decode()
+
+          def parse_pulls(raw):
+              raw = raw.replace(",", "")
+              if raw.upper().endswith("K"):
+                  return int(float(raw[:-1]) * 1000)
+              return int(raw)
+
+          pulls = re.findall(r"([\d,]+\.?\d*K?)\s+Pulls", html, re.IGNORECASE)
+          ollama_turbo = parse_pulls(pulls[0]) if len(pulls) > 0 else 0
+          ollama_nano  = parse_pulls(pulls[1]) if len(pulls) > 1 else 0
+
+          stats = {
+              "turbo":   {"ollama": ollama_turbo, "hf": hf_turbo, "total": ollama_turbo + hf_turbo},
+              "nano":    {"ollama": ollama_nano,  "hf": hf_nano,  "total": ollama_nano  + hf_nano},
+              "total":   ollama_turbo + hf_turbo + ollama_nano + hf_nano,
+              "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+          }
+
+          with open("stats.json", "w") as f:
+              json.dump(stats, f, indent=2)
+          print(f"Stats updated: {stats['total']} total downloads")
+          EOF
+
+      - name: Commit updated stats
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add stats.json
+          git diff --staged --quiet || git commit -m "chore: update download stats [skip ci]"
+          git push
