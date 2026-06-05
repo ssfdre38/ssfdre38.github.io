@@ -54,17 +54,18 @@
             top: 0;
             left: 0;
             right: 0;
-            background: rgba(10, 10, 15, 0.8);
-            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border-bottom: 1px solid var(--border);
             z-index: 1000;
-            padding: 16px 0;
+            padding: 12px 0;
             transition: all 0.3s ease;
         }
 
         nav.scrolled {
-            background: rgba(10, 10, 15, 0.95);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            background: rgba(10, 10, 15, 0.98);
+            padding: 8px 0;
         }
 
         nav .container {
@@ -74,18 +75,18 @@
         }
 
         nav .logo {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: var(--text);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         nav .logo img {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             border: 2px solid var(--primary);
             object-fit: cover;
@@ -93,7 +94,7 @@
 
         nav .nav-links {
             display: flex;
-            gap: 32px;
+            gap: 24px;
             align-items: center;
         }
 
@@ -101,7 +102,7 @@
             color: var(--text-light);
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             transition: color 0.2s ease;
         }
 
@@ -109,11 +110,50 @@
             color: var(--primary-light);
         }
 
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: var(--text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 6px;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+        .menu-toggle:hover { border-color: var(--primary); color: var(--primary-light); }
+
+        nav.open .nav-links {
+            display: flex !important;
+            flex-direction: column;
+            position: fixed;
+            top: 57px;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            gap: 0;
+            z-index: 999;
+        }
+        nav.open .nav-links a {
+            padding: 12px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 1rem;
+            display: block;
+            width: 100%;
+        }
+        nav.open .nav-links a:last-child { border-bottom: none; }
+
         /* Hero Section */
         header {
             background: linear-gradient(135deg, var(--bg-dark-800) 0%, var(--bg-dark-700) 100%);
             color: white;
-            padding: 160px 0 120px;
+            padding: 140px 0 100px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -168,7 +208,7 @@
         }
 
         header h1 {
-            font-size: 4.5rem;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
             margin-bottom: 24px;
             font-weight: 800;
             background: linear-gradient(135deg, #fff 0%, var(--primary-light) 100%);
@@ -179,7 +219,7 @@
         }
 
         header .tagline {
-            font-size: 1.5rem;
+            font-size: clamp(1rem, 4vw, 1.5rem);
             opacity: 0.9;
             margin-bottom: 40px;
             font-weight: 400;
@@ -187,6 +227,7 @@
             max-width: 700px;
             margin-left: auto;
             margin-right: auto;
+            padding: 0 20px;
         }
 
         .hero-cta {
@@ -207,18 +248,18 @@
             background: var(--bg-dark-700);
             border: 1px solid var(--border);
             border-radius: 20px;
-            padding: 48px;
+            padding: clamp(24px, 5vw, 48px);
             margin: -60px auto 0;
             position: relative;
             z-index: 10;
-            max-width: 1000px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            max-width: 1100px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
             text-align: center;
         }
 
@@ -253,7 +294,7 @@
         .breakthrough {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 64px 48px;
+            padding: clamp(32px, 8vw, 64px) clamp(24px, 5vw, 48px);
             border-radius: 24px;
             margin: 80px 0 60px;
             text-align: center;
@@ -291,14 +332,14 @@
         }
 
         .breakthrough h3 {
-            font-size: 2.5rem;
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
             margin-bottom: 16px;
             font-weight: 800;
             letter-spacing: -0.02em;
         }
 
         .breakthrough .big-stat {
-            font-size: 5rem;
+            font-size: clamp(3rem, 12vw, 5rem);
             font-weight: 900;
             margin: 32px 0;
             letter-spacing: -0.03em;
@@ -306,7 +347,7 @@
         }
 
         .breakthrough p {
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 3vw, 1.2rem);
             opacity: 0.95;
             max-width: 700px;
             margin: 0 auto;
@@ -323,7 +364,7 @@
         }
 
         .section-title {
-            font-size: 3rem;
+            font-size: clamp(2rem, 8vw, 3rem);
             margin-bottom: 16px;
             color: var(--text);
             font-weight: 800;
@@ -339,18 +380,20 @@
 
         .project-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
             margin-bottom: 40px;
         }
 
         .project-card {
             background: var(--bg-dark-700);
-            padding: 40px;
+            padding: clamp(24px, 5vw, 40px);
             border-radius: 20px;
             border: 1px solid var(--border);
             transition: all 0.3s ease;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .project-card::before {
@@ -377,7 +420,7 @@
 
         .project-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
         }
 
         .project-card .emoji {
@@ -401,16 +444,16 @@
 
         .stats {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             margin: 20px 0;
             flex-wrap: wrap;
         }
 
         .stat {
             background: var(--bg-dark-600);
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 50px;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-light);
             border: 1px solid var(--border);
@@ -425,32 +468,35 @@
             font-size: 0.8rem;
             font-weight: 600;
             margin-bottom: 16px;
+            align-self: flex-start;
         }
 
         .links {
             display: flex;
             gap: 12px;
-            margin-top: 24px;
+            margin-top: auto;
             flex-wrap: wrap;
         }
 
         .btn {
-            display: inline-block;
-            padding: 12px 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 600;
             transition: all 0.3s ease;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             border: none;
             cursor: pointer;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.5);
+            box-shadow: 0 8px 15px -5px rgba(139, 92, 246, 0.5);
         }
 
         .btn-secondary {
@@ -461,7 +507,6 @@
         .btn-secondary:hover {
             background: var(--bg-dark-700);
             border-color: var(--primary);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
         }
 
         .btn-outline {
@@ -486,8 +531,8 @@
 
         .footer-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 48px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
             margin-bottom: 48px;
         }
 
@@ -519,7 +564,7 @@
             color: var(--text-light);
             text-decoration: none;
             transition: color 0.2s ease;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .footer-links a:hover {
@@ -528,7 +573,7 @@
 
         .social-links {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             margin-top: 20px;
         }
 
@@ -536,11 +581,11 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             background: var(--bg-dark-600);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 10px;
             color: var(--text-light);
             text-decoration: none;
             transition: all 0.2s ease;
@@ -558,55 +603,13 @@
             padding-top: 32px;
             text-align: center;
             color: var(--text-muted);
+            font-size: 0.9rem;
         }
-
-        /* Mobile Menu Toggle */
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: 1px solid rgba(255,255,255,0.15);
-            color: var(--text);
-            font-size: 1.3rem;
-            cursor: pointer;
-            padding: 6px 12px;
-            border-radius: 6px;
-            line-height: 1;
-            transition: all 0.2s;
-        }
-        .menu-toggle:hover { border-color: var(--primary); color: var(--primary-light); }
-
-        nav.open .nav-links {
-            display: flex !important;
-            flex-direction: column;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: rgba(10, 10, 15, 0.98);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border);
-            gap: 0;
-            z-index: 999;
-        }
-        nav.open .nav-links a {
-            padding: 12px 24px;
-            border-bottom: 1px solid var(--border);
-            font-size: 1rem;
-            display: block;
-            width: 100%;
-        }
-        nav.open .nav-links a:last-child { border-bottom: none; }
 
         /* Responsive */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 2.5rem;
-            }
-
-            header .tagline {
-                font-size: 1.1rem;
+            .stats-section {
+                margin: -40px 16px 0;
             }
 
             .hero-emoji {
@@ -614,33 +617,12 @@
                 height: 120px;
             }
 
-            .project-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-section {
-                padding: 32px 24px;
-                margin: -40px 16px 0;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .breakthrough {
-                padding: 48px 32px;
-            }
-
-            .breakthrough .big-stat {
-                font-size: 3.5rem;
+            .menu-toggle {
+                display: block;
             }
 
             nav .nav-links {
                 display: none;
-            }
-
-            .menu-toggle {
-                display: block;
             }
 
             .hero-cta {
@@ -664,7 +646,7 @@
             }
 
             .project-card {
-                padding: 28px;
+                padding: 24px;
             }
         }
     </style>
@@ -743,7 +725,6 @@
             </div>
 
             <div class="project-grid">
-            <div class="project-grid">
                 <!-- Pocket Ash -->
                 <div class="project-card">
                     <span class="project-label">Mobile App</span>
@@ -768,7 +749,7 @@
                     <h3>gemma4-nano</h3>
                     <p>Ultra-compressed Gemma 4 models that actually work on mobile. Real-world tested: stays cool where stock models overheat. 57% smaller, infinitely more usable.</p>
                     <div class="stats">
-                        <span class="stat">20+ tok/s</span>
+                        <span class="stat">1.1K+ Pulls</span>
                         <span class="stat">3.1-13 GB</span>
                         <span class="stat">4 variants</span>
                     </div>
@@ -782,16 +763,16 @@
 
                 <!-- gemma4-turbo -->
                 <div class="project-card">
-                    <span class="project-label">Kaggle Gemma 4 Good Hackathon Contestent</span>
+                    <span class="project-label">Hackathon Innovation</span>
                     <span class="emoji">🚀</span>
                     <h3>gemma4-turbo</h3>
-                    <p>IQ4_XS quantization from BF16 with vision encoder. High quality compression for desktop and server deployment. Contest-winning innovation.</p>
+                    <p>IQ4_XS quantization from BF16 with vision encoder. High quality compression for desktop and server deployment. #1 community choice for Gemma 4.</p>
                     <div class="stats">
-                        <span class="stat">Vision Support</span>
+                        <span class="stat">18.8K+ Pulls</span>
                         <span class="stat">4.3-18 GB</span>
-                        <span class="stat">4 sizes</span>
+                        <span class="stat">Vision Support</span>
                     </div>
-                    <p><strong>Kaggle Hackathon Winner</strong></p>
+                    <p><strong>The Community Standard</strong></p>
                     <div class="links">
                         <a href="https://ollama.com/ssfdre38/gemma4-turbo" class="btn">Ollama Hub</a>
                         <a href="https://github.com/ssfdre38/gemma4-turbo" class="btn-secondary btn">GitHub</a>
@@ -858,8 +839,8 @@
                         </a>
                         <a href="https://ollama.com/ssfdre38" class="social-link" title="Ollama Hub">
                             <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 6v12M6 12h12" stroke="white" stroke-width="2"/>
+                                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 6v12M6 12h12" stroke="currentColor" stroke-width="2"/>
                             </svg>
                         </a>
                         <a href="https://huggingface.co/ssfdre38" class="social-link" title="Hugging Face">
@@ -894,8 +875,8 @@
                     <h4>Research & Innovation</h4>
                     <div class="footer-links">
                         <a href="grey-liquid.html" style="color: var(--secondary); font-weight: 600;">🔬 Grey Liquid Lab</a>
-                        <a href="grey-liquid.html">Compression Research</a>
-                        <a href="support.html">Support Research</a>
+                        <a href="research.html">Beyond TurboQuant</a>
+                        <a href="https://g4turbo.com">G4 Turbo Portal</a>
                         <a href="https://github.com/ssfdre38?tab=repositories">All Projects</a>
                     </div>
                 </div>
@@ -921,20 +902,28 @@
         // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                const href = this.getAttribute('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                        // Close menu if open
+                        const navEl = document.getElementById('nav');
+                        if (navEl) navEl.classList.remove('open');
+                        const menuToggle = document.querySelector('.menu-toggle');
+                        if (menuToggle) menuToggle.textContent = '☰';
+                    }
                 }
             });
         });
 
         // Hamburger menu
         const menuToggle = document.querySelector('.menu-toggle');
-        const navEl = document.getElementById('nav') || document.querySelector('nav');
+        const navEl = document.getElementById('nav');
         if (menuToggle && navEl) {
             menuToggle.addEventListener('click', (e) => {
                 e.stopPropagation();
