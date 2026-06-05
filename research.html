@@ -700,7 +700,48 @@
                     They said "mobile-ready." We made it actually work.</p>
                 </div>
 
-                <h2>Open Questions</h2>
+                <h2>New Discovery: The Hidden Architecture (Paper #005)</h2>
+                <p>
+                    Our latest research (June 5, 2026) has uncovered a critical secret inside the Gemma 4 architecture. 
+                    It is not a uniform model, but a **hard-coded ensemble** of two physically incompatible sub-networks.
+                </p>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-number">7</span>
+                        <span class="stat-label">Global Backbone Layers</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">35</span>
+                        <span class="stat-label">Local SWA Layers</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">0.5x</span>
+                        <span class="stat-label">Tensor Scaling (Local)</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">✅</span>
+                        <span class="stat-label">llama.cpp Fix Merged</span>
+                    </div>
+                </div>
+
+                <p>
+                    <strong>Physical Evidence:</strong> We found that the Sliding Window Attention (SWA) layers use 
+                    tensors that are physically 50% smaller ([2560, 2048]) than the full-attention layers ([2560, 4096]). 
+                    This mismatch proves that SWA is baked into the hardware-level design of the model.
+                </p>
+
+                <p>
+                    <strong>Functional Impact:</strong> Removing the 7 "Global Integration" layers causes total semantic 
+                    collapse. These layers act as the "brain" of the model, coordinating the 35 local "processing" layers. 
+                    This discovery validates our **Mixture of Models (MoM)** theory and led to a core bug fix in 
+                    llama.cpp (PR #23131).
+                </p>
+
+                <a href="https://github.com/ssfdre38/grey-liquid-labs/blob/main/papers/GREY_LIQUID_PAPER_005_HIDDEN_ARCHITECTURE.md" class="btn" style="margin-bottom: 4rem;">Read the Hidden Architecture Paper →</a>
+
+                <h2>Availability</h2>
+
 
                 <p>Our research raises several questions for future work:</p>
 
