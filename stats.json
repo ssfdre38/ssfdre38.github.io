@@ -1,14 +1,14 @@
 {
   "turbo": {
     "ollama": 0,
-    "hf": 354,
-    "total": 354
+    "hf": 321,
+    "total": 321
   },
   "nano": {
     "ollama": 0,
-    "hf": 385,
-    "total": 385
+    "hf": 330,
+    "total": 330
   },
-  "total": 739,
-  "updated": "2026-06-16T07:52:47Z"
+  "total": 651,
+  "updated": "2026-06-17T07:44:58Z"
 }
